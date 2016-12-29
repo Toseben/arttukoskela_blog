@@ -16,4 +16,4 @@ Testing clicking.
 
 <center><h1>OR</h1></center>
 
-<a href="%url%/work/multiBox_clickChangeColor.html" target="_blank"><img src="%url%/work/multiBox_clickChangeColor.jpg"></a>
+<a href="../work/multiBox_clickChangeColor.html" target="_blank"><img src="../work/multiBox_clickChangeColor.jpg"></a>

@@ -12,8 +12,8 @@ comments: false
 ---
 
 <figure class="half">
-    <a href="https://www.youtube.com/watch?v=sr6lr_VRsEo"><img src="/assets/img/thumb/john_lewis.jpg"></a>
-    <a href="https://www.youtube.com/watch?v=tXek6jW3eWI"><img src="/assets/img/thumb/metropolis.jpg"></a>
+    <a href="https://www.youtube.com/watch?v=sr6lr_VRsEo"><img src="../assets/img/thumb/john_lewis.jpg"></a>
+    <a href="https://www.youtube.com/watch?v=tXek6jW3eWI"><img src="../assets/img/thumb/metropolis.jpg"></a>
 </figure>
 
 <figure class="half">
