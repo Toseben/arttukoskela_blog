@@ -1,0 +1,17 @@
+.gif {
+    background-color: #ffffff;
+}
+
+.gif img {
+    opacity: 1;
+    width: 100%;
+    height: auto;
+    transform: scale(1);
+    transition: opacity 0.25s, transform 0.25s;
+}
+
+.gif img:hover {
+    opacity: 0.25;
+    transform: scale(0.95);
+
+}

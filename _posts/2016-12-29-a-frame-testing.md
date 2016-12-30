@@ -1,19 +1,20 @@
 ---
 layout: post
-title: "A-Frame Testing"
+title: "Box Interaction and Geometry Templates"
 date: 2016-12-29
-excerpt: "First test post on the blog."
-tags: [sample post, vr, test, image, feature]
+excerpt: "Different ways to interact with boxes and creating procedural template laytouts with Nunjucks."
+tags: [a-frame, interact, template, nunjucks, vr]
 comments: false
 ---
 
-## A-Frame Test
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ site.url }}/assets/css/style.css">
+</head>
 
-Testing clicking.
+## Forage occaecat cardigan qui
 
-<p><iframe src="{{ site.url }}/work/multiBox_clickChangeColor.html" width="100%" height="300" frameborder="0" scrolling="no"> </iframe></p>
-<p><em>To pop it up for your VR goggles, <a href="{{ site.url }}/work/multiBox_clickChangeColor.html" target="_blank">click here</a></em></p>
+Fashion axe hella gastropub lo-fi kogi 90's aliquip +1 veniam delectus tousled. Cred sriracha locavore gastropub kale chips, iPhone mollit sartorial. Anim dolore 8-bit, pork belly dolor photo booth aute flannel small batch. Dolor disrupt ennui, tattooed whatever salvia Banksy sartorial roof party selfies raw denim sint meh pour-over. Ennui eu cardigan sint, gentrify iPhone cornhole.
 
-<center><h1>OR</h1></center>
-
-<a href="{{ site.url }}/work/multiBox_clickChangeColor.html" target="_blank"><img src="{{ site.url }}/work/multiBox_clickChangeColor.jpg"></a>
+<div class="gif">
+    <a href="{{ site.url }}/work/multiBox_clickChangeColor.html" target="_blank"><img src="{{ site.url }}/work/multiBox_clickChangeColor.gif"></a>
+</div>

@@ -24,7 +24,7 @@
                 init: function () {
                     this.el.addEventListener('click', function () {
                         var seed = Math.random();
-                        var color = new THREE.Color().setRGB( getRandom(0, 1, seed, 1), getRandom(0, 1, seed, 2), getRandom(0, 1, seed, 3) );
+                        var color = new THREE.Color().setRGB( getRandom(0, 1, seed, 1), getRandom(0, 1, seed, 1), getRandom(0, 1, seed, 1) );
                         color = color.getHexString();
                         this.setAttribute('material', 'color', '#' + color);
                     });
@@ -37,16 +37,21 @@
         <a-scene antialias="true">
             <a-assets>
             <script id="singleBox" type="text/x-nunjucks-template">
-                <a-entity class="testing" position="{{ position }}">
-                    <a-entity cursor-listener geometry="primitive: box" material="color: #ff99ff"></a-entity>
+                <a-entity class="box" position="{{ position }}">
+                    <a-entity cursor-listener geometry="primitive: box" material="color: {{ color }}; wireframe: false"></a-entity>
                 </a-entity>
             </script>
                 
             <script id="multiBox" type="text/x-nunjucks-template">
-                {% for x in range(0, 6) %}
-                    {% for z in range(0, 6) %}
-                        <a-entity template="src: #singleBox; type: handlebars"
-                            data-position="{{ x * 1.05 - (5 * 0.5 * 1.05) }} {{ z * 1.05 - 1}} -7.5"></a-entity>
+                {% for x in range(-3, 4) %}
+                    {% for y in range(-3, 4) %}
+                        {% for z in range(-3, 4) %}
+                            {% if x|abs > 2 or y|abs > 2 or z|abs > 2 %}
+                                <a-entity template="src: #singleBox; type: handlebars"
+                                    data-position="{{ x * 1.25}} {{ y * 1.25 + 1.6 }} {{ z * 1.25 - 2.5}}"
+                                    data-color="hsl({{ (x|abs + 0.5) * 15 }}, 70%, {{ x|abs * 15 + 30 }}%)"></a-entity>
+                            {% endif %}
+                        {% endfor %}
                     {% endfor %}
                 {% endfor %}
             </script>
@@ -57,12 +62,18 @@
                 <a-entity cursor
                     position="0 0 -0.25"
                     geometry="primitive: ring; radiusOuter: 0.01; radiusInner: 0.0075;"
-                    material="color: cyan; shader: flat">
+                    material="color: #e74c3c; shader: flat">
+                </a-entity>
+                
+                <a-entity cursor
+                    position="0 0 -0.25"
+                    geometry="primitive: ring; radius-inner: 0.00001; radius-outer: 0.0025"
+                    material="color: #e74c3c; shader: flat">
                 </a-entity>
             </a-camera>
             
             <a-entity template="src: #multiBox"></a-entity>   
-            <a-sky color="#e2e2e2"></a-sky>
+            <a-sky color="#3398db"></a-sky>
         </a-scene>
         
     </body>
