@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Change Color On Click</title>
+        <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
+        <script src="https://rawgit.com/ngokevin/aframe-layout-component/master/dist/aframe-layout-component.min.js"></script>
+        <script src="https://rawgit.com/ngokevin/aframe-template-component/master/dist/aframe-template-component.min.js"></script>
+    </head>
+    
+    <body>
+
+        <script>
+            // Random Function with Fit & Seed
+            function getRandom(min, max, seed, offset) {
+                seed += offset;
+                var x = Math.sin(seed++) * 10000;
+                x -= Math.floor(x);
+                x = x * (max - min) + min;
+                return x;
+            }
+            
+            // Component to change to random color on click.
+            AFRAME.registerComponent('cursor-listener', {
+                init: function () {
+                    this.el.addEventListener('stateadded', function (evt) {
+                        if (evt.detail.state === 'cursor-hovered') {
+                            var seed = Math.random();
+                            var color = new THREE.Color().setRGB( getRandom(0, 1, seed, 1), getRandom(0, 1, seed, 1), getRandom(0, 1, seed, 1) );
+                            color = color.getHexString();
+                            this.setAttribute('material', 'color', '#' + color);
+                            this.setAttribute('scale', "1.25 1.25 1.25")
+                        }
+                    });
+                }
+            });
+
+        </script>
+        
+        <!-- A-Frame Scene -->
+        <a-scene antialias="true">
+            <a-assets>
+            <script id="singleBox" type="text/x-nunjucks-template">
+                <a-entity class="box" position="{{ position }}">
+                    <a-entity cursor-listener geometry="primitive: box" material="color: {{ color }}; wireframe: false"></a-entity>
+                </a-entity>
+            </script>
+                
+            <script id="multiBox" type="text/x-nunjucks-template">
+                {% for x in range(-3, 4) %}
+                    {% for y in range(-3, 4) %}
+                        {% for z in range(-3, 4) %}
+                            {% if x|abs > 2 or y|abs > 2 or z|abs > 2 %}
+                                <a-entity template="src: #singleBox; type: handlebars"
+                                    data-position="{{ x * 1.25}} {{ y * 1.25 + 1.6 }} {{ z * 1.25 - 2.5}}"
+                                    data-color="hsl({{ (x|abs + 0.5) * 15 }}, 70%, {{ x|abs * 15 + 30 }}%)"></a-entity>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+            </script>
+            </a-assets>
+            
+            <!-- Camera -->
+            <a-camera> 
+                <a-entity cursor="fuse: true"
+                    position="0 0 -0.25"
+                    geometry="primitive: ring; radius-inner: 0.00001; radius-outer: 0.0025"
+                    material="color: #e74c3c; shader: flat">
+                </a-entity>
+            </a-camera>
+            
+            <a-entity template="src: #multiBox"></a-entity>   
+            <a-sky color="#3398db"></a-sky>
+        </a-scene>
+        
+    </body>
+</html>
