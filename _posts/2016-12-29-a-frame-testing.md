@@ -21,8 +21,8 @@ Fashion axe hella gastropub lo-fi kogi 90's aliquip +1 veniam delectus tousled. 
 
 <div class="gif">
     <a href="{{ site.url }}/work/multiBox_hoverChangeColor.html" target="_blank"><img src="{{ site.url }}/work/multiBox_hoverChangeColor.gif"></a>
-</div>
+</div><br>
 
 <div class="gif">
-    <a href="{{ site.url }}/work/raycaster_returnNormal.html" target="_blank"><img src="{{ site.url }}/work/multiBox_hoverChangeColor.gif"></a>
+    <a href="{{ site.url }}/work/raycaster_returnNormal.html" target="_blank"><img src="{{ site.url }}/work/raycaster_returnNormal.gif"></a>
 </div>

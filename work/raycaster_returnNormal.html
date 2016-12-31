@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Place Object On Surface - Raycaster</title>
+        <title>Hover Object On Surface - Raycaster</title>
         <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
         <script src="https://rawgit.com/ngokevin/aframe-layout-component/master/dist/aframe-layout-component.min.js"></script>
         <script src="https://rawgit.com/ngokevin/aframe-template-component/master/dist/aframe-template-component.min.js"></script>
@@ -53,7 +53,6 @@
         <!-- A-Frame Scene -->
         <a-scene>
             <a-assets>
-                <img id="earth-texture" src="img/earth.png">
                 <a-asset-item id="tree-obj" src="geo/tree.obj"></a-asset-item>
             </a-assets>
             
@@ -64,7 +63,7 @@
                           geometry="primitive: ring; radius-inner: 0.00001; radius-outer: 0.0025"
                           material="color: #e74c3c; shader: flat"
                           ></a-entity>
-            </a-camera>d
+            </a-camera>
             
             <a-entity id="tree"
                       obj-model="obj: #tree-obj"
@@ -78,10 +77,10 @@
             <a-entity id="earth"
                       geometry="primitive: sphere"
                       position="0 1.5 -2.5"
-                      material="src: #earth-texture; shader: flat"
+                      material="shader: flat; src: url(img/earth.jpg)"
                       collider-check
                       ></a-entity>
-            <a-sky color="#3398db"></a-sky>
+            <a-sky color="#2c3e50"></a-sky>
         </a-scene>
         
     </body>
