@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Place Object On Surface - Raycaster</title>
+        <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
+        <script src="https://rawgit.com/ngokevin/aframe-layout-component/master/dist/aframe-layout-component.min.js"></script>
+        <script src="https://rawgit.com/ngokevin/aframe-template-component/master/dist/aframe-template-component.min.js"></script>
+    </head>
+    
+    <body>
+        
+        <script>
+            // Component to scale mesh
+            AFRAME.registerComponent('mesh-scale', {
+                schema: { type: 'vec3' },
+                
+                init: function () {
+                    var entity = this.el;
+                    var mesh = entity.getObject3D( 'mesh' );
+                    mesh.scale.set( this.data.x, this.data.y, this.data.z );
+                }
+            });
+            
+            // Component to offset mesh transformation
+            AFRAME.registerComponent('mesh-transform', {
+                schema: { type: 'vec3' },
+                
+                init: function () {
+                    var mesh = this.el.getObject3D( 'mesh' );
+                    var geo = mesh.geometry;
+                    geo.applyMatrix( new THREE.Matrix4().makeTranslation( this.data.x, this.data.y, this.data.z ) );
+                    
+                    // Get THREE.Scene
+                    var scene = this.el.sceneEl;
+                }
+            });
+            
+            // Component to orient entity to surface
+            AFRAME.registerComponent('collider-check', {
+                dependencies: ['raycaster'],
+                init: function () {
+                    this.el.addEventListener('raycaster-intersected', function (evt) {
+                        var normal = evt.detail.intersection.face.normal.normalize();
+                        var pos = evt.detail.intersection.point;
+                        tree.setAttribute('position', { x: pos.x, y: pos.y, z: pos.z });
+                        var mesh = tree.getObject3D( 'mesh' );
+                        mesh.lookAt( normal );
+                });
+              }
+            });
+        </script>
+        
+        <!-- A-Frame Scene -->
+        <a-scene>
+            <a-assets>
+                <img id="earth-texture" src="img/earth.png">
+                <a-asset-item id="tree-obj" src="geo/tree.obj"></a-asset-item>
+            </a-assets>
+            
+            <!-- Camera -->
+            <a-camera> 
+                <a-entity raycaster
+                          position="0 0 -0.25"
+                          geometry="primitive: ring; radius-inner: 0.00001; radius-outer: 0.0025"
+                          material="color: #e74c3c; shader: flat"
+                          ></a-entity>
+            </a-camera>d
+            
+            <a-entity id="tree"
+                      obj-model="obj: #tree-obj"
+                      position="0 1.5 -1.5"
+                      mesh-scale="0.1 0.1 1"
+                      scale="0.25 0.25 0.25"
+                      mesh-transform="0 0 0.5"
+                      material="color: #28af60"
+                      ></a-entity>
+            
+            <a-entity id="earth"
+                      geometry="primitive: sphere"
+                      position="0 1.5 -2.5"
+                      material="src: #earth-texture; shader: flat"
+                      collider-check
+                      ></a-entity>
+            <a-sky color="#3398db"></a-sky>
+        </a-scene>
+        
+    </body>
+</html>

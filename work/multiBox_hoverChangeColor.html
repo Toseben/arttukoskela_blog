@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Change Color On Click</title>
+        <title>Change Color On Hover</title>
         <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
         <script src="https://rawgit.com/ngokevin/aframe-layout-component/master/dist/aframe-layout-component.min.js"></script>
         <script src="https://rawgit.com/ngokevin/aframe-template-component/master/dist/aframe-template-component.min.js"></script>
@@ -19,7 +19,7 @@
                 return x;
             }
             
-            // Component to change to random color on click.
+            // Component to change to random color on hover.
             AFRAME.registerComponent('cursor-listener', {
                 init: function () {
                     this.el.addEventListener('stateadded', function (evt) {
