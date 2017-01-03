@@ -1,0 +1,22 @@
+.button {
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    position: absolute;
+    width: 250px;
+    left: 0;
+    z-index: 10;
+    background-color: #4caf57;
+}
+
+.append {
+    top: 50px;
+}
+
+.duplicate {
+    top: 100px;
+}

@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Hover Object On Surface - Raycaster</title>
+        <link rel="stylesheet" href="css/duplicateOnClick.css">
         <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
     </head>
     
@@ -46,7 +47,46 @@
                 });
               }
             });
+            
+            // Duplicate
+            AFRAME.registerComponent('duplicate-mesh', {
+                init: function () {      
+                    // Geometry
+                    var container = this.el;
+                    var initial = container.children.tree;
+                    var count = 1;
+                    // Click
+                    var duplicate_button = document.getElementById( 'duplicate' );
+                    duplicate_button.addEventListener('click', function() {
+                        var clone = initial.cloneNode(true); 
+                        var rot = initial.object3D.children[0].rotation;
+                        
+                        // Naa matchaa
+                        console.log(initial);
+                        console.log(clone);                        
+                        
+                        // Naissa parent on eri
+                        console.log(initial.object3D);
+                        console.log(clone.object3D);
+                        
+                        // Tuo clone.object3D.children[0] on siis objekti jonka tarviin
+                        console.log(initial.object3D.children[0]);
+                        console.log(clone.object3D.children[0]);
+                        
+                        clone.setAttribute('id', 'tree_' + count);
+                        var init_pos = initial.getAttribute('position');
+                        clone.setAttribute('position', init_pos);
+                        container.appendChild(clone);
+                        count += 1;
+                        
+                        
+                    });
+                }
+            });
         </script>
+        
+        <!-- Button -->
+        <button type="button" class="button" id="duplicate">DUPLICATE MESH</button>
         
         <!-- A-Frame Scene -->
         <a-scene>
@@ -56,21 +96,24 @@
             
             <!-- Camera -->
             <a-camera> 
-                <a-entity raycaster
+                <a-entity id="raycaster"
+                          raycaster
                           position="0 0 -0.25"
                           geometry="primitive: ring; radius-inner: 0.00001; radius-outer: 0.0025"
                           material="color: #e74c3c; shader: flat"
                           ></a-entity>
             </a-camera>
             
-            <a-entity id="tree"
-                      obj-model="obj: #tree-obj"
-                      position="0 1.5 -1.5"
-                      mesh-scale="0.1 0.1 1"
-                      scale="0.25 0.25 0.25"
-                      mesh-transform="0 0 0.5"
-                      material="color: #28af60"
-                      ></a-entity>
+            <a-entity id="trees" duplicate-mesh>
+                <a-entity id="tree"
+                          obj-model="obj: #tree-obj"
+                          position="0 1.5 -1.5"
+                          mesh-scale="0.1 0.1 1"
+                          scale="0.25 0.25 0.25"
+                          mesh-transform="0 0 0.5"
+                          material="color: #28af60"
+                ></a-entity>
+            </a-entity>
             
             <a-entity id="earth"
                       geometry="primitive: sphere"

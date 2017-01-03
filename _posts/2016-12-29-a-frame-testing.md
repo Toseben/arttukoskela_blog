@@ -16,13 +16,13 @@ comments: false
 Fashion axe hella gastropub lo-fi kogi 90's aliquip +1 veniam delectus tousled. Cred sriracha locavore gastropub kale chips, iPhone mollit sartorial. Anim dolore 8-bit, pork belly dolor photo booth aute flannel small batch. Dolor disrupt ennui, tattooed whatever salvia Banksy sartorial roof party selfies raw denim sint meh pour-over. Ennui eu cardigan sint, gentrify iPhone cornhole.
 
 <div class="gif">
-    <a href="{{ site.url }}/work/multiBox_clickChangeColor.html" target="_blank"><img src="{{ site.url }}/work/multiBox_clickChangeColor.gif"></a>
+    <a href="{{ site.url }}/work/multiBox_clickChangeColor.html" target="_blank"><img src="{{ site.url }}/work/thumb/multiBox_clickChangeColor.gif"></a>
 </div><br>
 
 <div class="gif">
-    <a href="{{ site.url }}/work/multiBox_hoverChangeColor.html" target="_blank"><img src="{{ site.url }}/work/multiBox_hoverChangeColor.gif"></a>
+    <a href="{{ site.url }}/work/multiBox_hoverChangeColor.html" target="_blank"><img src="{{ site.url }}/work/thumb/multiBox_hoverChangeColor.gif"></a>
 </div><br>
 
 <div class="gif">
-    <a href="{{ site.url }}/work/raycaster_returnNormal.html" target="_blank"><img src="{{ site.url }}/work/raycaster_returnNormal.gif"></a>
+    <a href="{{ site.url }}/work/raycaster_returnNormal.html" target="_blank"><img src="{{ site.url }}/work/thumb/raycaster_returnNormal.gif"></a>
 </div>

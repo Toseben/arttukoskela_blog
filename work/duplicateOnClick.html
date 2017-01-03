@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Duplicate On Click</title>
+        <link rel="stylesheet" href="css/duplicateOnClick.css">
+        <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
+    </head>
+
+    <body>
+        <script>
+        
+            // REPLACE
+            AFRAME.registerComponent('replace-mesh', {
+                init: function () {
+                    // THREE.Scene
+                    var scene = this.el.sceneEl.object3D;
+                    
+                    // Geometry
+                    var entity = this.el;
+                    var mesh = entity.getObject3D( 'mesh' );
+                    var geometry = mesh.geometry;
+                    
+                    var duplicate_button = document.getElementById( 'replace' );
+                    duplicate_button.addEventListener('click', function() {
+                        var material = new THREE.MeshBasicMaterial();
+                        var mesh = new THREE.Mesh(geometry, material);
+                        mesh.position.set( 0, 2, 0 );
+                        entity.setObject3D('mesh', mesh);
+                    });
+                }
+            });
+            
+            // APPEND
+            AFRAME.registerComponent('append-mesh', {
+                init: function () {
+                    // THREE.Scene
+                    var scene = this.el.sceneEl.object3D;
+                    
+                    // Container
+                    var container = this.el;
+                    
+                    var duplicate_button = document.getElementById( 'append' );
+                    duplicate_button.addEventListener('click', function() {
+                        var box = document.createElement('a-entity');
+                        box.setAttribute('id', 'append_entity');
+                        box.setAttribute('geometry', {primitive: 'box'});
+                        box.setAttribute('position', { x: 0, y: 2.75, z: -1 });
+                        box.setAttribute('material', {color: '#ff0000'});
+                        container.appendChild(box);
+                    });
+                }
+            });
+            
+            // DUPLICATE
+            AFRAME.registerComponent('duplicate-mesh', {
+                init: function () {
+                    // THREE.Scene
+                    var scene = this.el.sceneEl.object3D;
+                    
+                    // Geometry
+                    var container = this.el;
+                    var initial = container.children.initial_entity;
+                    
+                    var duplicate_button = document.getElementById( 'duplicate' );
+                    duplicate_button.addEventListener('click', function() {
+                        var clone = initial.cloneNode(true);
+                        clone.setAttribute('id', 'duplicate_entity');
+                        var init_pos = initial.getAttribute('position');
+                        clone.setAttribute('position', { x: init_pos.x + 2, y: init_pos.y, z: init_pos.z });
+                        container.appendChild(clone);
+                    });
+                }
+            });
+        
+        </script>
+
+        <button type="button" class="replace button" id="replace">REPLACE MESH</button>
+        <button type="button" class="append button" id="append">APPEND ENTITY</button>
+        <button type="button" class="duplicate button" id="duplicate">DUPLICATE ENTITY</button>
+        
+        <a-scene>
+            <a-entity id="duplicate_container"
+                      duplicate-mesh
+                      append-mesh>
+                <a-entity id="initial_entity"
+                          geometry="primitive: sphere"
+                          position="0 1.25 -1"
+                          material="color: #ff0000"
+                          replace-mesh
+                ></a-entity>
+            </a-entity>
+            
+            <a-sky color="#ECECEC"></a-sky>
+            <a-entity position="0 0 3.8">
+                <a-camera></a-camera>
+            </a-entity>
+        </a-scene>
+        
+    </body>
+</html>
