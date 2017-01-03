@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Simple Duplicate Test</title>
+        <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
+    </head>
+    
+    <body>
+        
+        <script>
+            
+            // Duplicate
+            AFRAME.registerComponent('duplicate', {
+                init: function () {     
+                    
+                    // Geometry
+                    var initial = this.el;
+                    var scene = this.el.sceneEl;
+                    
+                    // Click
+                    var duplicate_button = document.getElementById( 'duplicate' );
+                    duplicate_button.addEventListener('click', function() {
+                        var clone = initial.cloneNode(true);
+                        clone.setAttribute('position', {x: -1.5, y: 1.5, z: -2.5});
+                        scene.appendChild(clone);
+                        
+                        // Returns Mesh
+                        console.log(initial.getObject3D('mesh'));
+                        // Returns undefined
+                        console.log(clone.getObject3D('mesh'));
+                        
+                    });
+                }
+            });
+        </script>
+        
+        <!-- Button -->
+        <button type="button" class="button" id="duplicate">DUPLICATE MESH</button>
+        
+        <!-- A-Frame Scene -->
+        <a-scene>
+            <a-assets>
+                <a-asset-item id="tree-obj" src="geo/tree.obj"></a-asset-item>
+            </a-assets>
+            <a-entity>
+                <a-box id="box"
+                          position="1.5 1.5 -2.5"
+                          rotation="0 0 0"
+                          duplicate
+                      ></a-box>
+            </a-entity>
+            <a-sky color="#2c3e50"></a-sky>
+        </a-scene>
+        
+    </body>
+</html>

@@ -25,4 +25,8 @@ Fashion axe hella gastropub lo-fi kogi 90's aliquip +1 veniam delectus tousled. 
 
 <div class="gif">
     <a href="{{ site.url }}/work/raycaster_returnNormal.html" target="_blank"><img src="{{ site.url }}/work/thumb/raycaster_returnNormal.gif"></a>
-</div>
+</div><br>
+
+<div class="gif">
+    <a href="{{ site.url }}/work/raycaster_duplicate.html" target="_blank"><img src="{{ site.url }}/work/thumb/raycaster_duplicate.gif"></a>
+</div><br>

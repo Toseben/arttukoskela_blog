@@ -9,31 +9,6 @@
     <body>
         
         <script>
-            // Component to scale mesh
-            AFRAME.registerComponent('mesh-scale', {
-                schema: { type: 'vec3' },
-                
-                init: function () {
-                    var entity = this.el;
-                    var mesh = entity.getObject3D( 'mesh' );
-                    mesh.scale.set( this.data.x, this.data.y, this.data.z );
-                }
-            });
-            
-            // Component to offset mesh transformation
-            AFRAME.registerComponent('mesh-transform', {
-                schema: { type: 'vec3' },
-                
-                init: function () {
-                    var mesh = this.el.getObject3D( 'mesh' );
-                    var geo = mesh.geometry;
-                    geo.applyMatrix( new THREE.Matrix4().makeTranslation( this.data.x, this.data.y, this.data.z ) );
-                    
-                    // Get A=Frame Scene
-                    var scene = this.el.sceneEl;
-                }
-            });
-            
             // Component to orient entity to surface
             AFRAME.registerComponent('collider-check', {
                 dependencies: ['raycaster'],
@@ -49,37 +24,31 @@
             });
             
             // Duplicate
-            AFRAME.registerComponent('duplicate-mesh', {
+            AFRAME.registerComponent('duplicate', {
                 init: function () {      
                     // Geometry
-                    var container = this.el;
-                    var initial = container.children.tree;
+                    var container = this.el.parentElement;
+                    var initial = this.el;
                     var count = 1;
                     // Click
                     var duplicate_button = document.getElementById( 'duplicate' );
                     duplicate_button.addEventListener('click', function() {
                         var clone = initial.cloneNode(true); 
-                        var rot = initial.object3D.children[0].rotation;
-                        
-                        // Naa matchaa
-                        console.log(initial);
-                        console.log(clone);                        
-                        
-                        // Naissa parent on eri
-                        console.log(initial.object3D);
-                        console.log(clone.object3D);
-                        
-                        // Tuo clone.object3D.children[0] on siis objekti jonka tarviin
-                        console.log(initial.object3D.children[0]);
-                        console.log(clone.object3D.children[0]);
-                        
                         clone.setAttribute('id', 'tree_' + count);
                         var init_pos = initial.getAttribute('position');
                         clone.setAttribute('position', init_pos);
+                        clone.removeAttribute('duplicate');
                         container.appendChild(clone);
                         count += 1;
                         
-                        
+                        // Listener
+                        clone.addEventListener('loaded', function () {
+                            var rot = initial.object3D.children[0].rotation;
+                            var clone_mesh = clone.object3D.children[0].parent;
+                            clone_mesh.rotation.x = rot.x;
+                            clone_mesh.rotation.y = rot.y;
+                            clone_mesh.rotation.z = rot.z;
+                        });
                     });
                 }
             });
@@ -104,14 +73,13 @@
                           ></a-entity>
             </a-camera>
             
-            <a-entity id="trees" duplicate-mesh>
+            <a-entity id="trees">
                 <a-entity id="tree"
                           obj-model="obj: #tree-obj"
                           position="0 1.5 -1.5"
-                          mesh-scale="0.1 0.1 1"
                           scale="0.25 0.25 0.25"
-                          mesh-transform="0 0 0.5"
                           material="color: #28af60"
+                          duplicate
                 ></a-entity>
             </a-entity>
             
