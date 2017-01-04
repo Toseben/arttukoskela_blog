@@ -37,6 +37,7 @@
                         clone.setAttribute('id', 'tree_' + count);
                         var init_pos = initial.getAttribute('position');
                         clone.setAttribute('position', init_pos);
+                        clone.setAttribute('remove', true);
                         clone.removeAttribute('duplicate');
                         container.appendChild(clone);
                         count += 1;
@@ -49,13 +50,40 @@
                             clone_mesh.rotation.y = rot.y;
                             clone_mesh.rotation.z = rot.z;
                         });
-                    });
+                    });                           
                 }
             });
+
+            // Remove
+            AFRAME.registerComponent('remove', {
+                init: function () {
+                    var entity = this.el;
+                    // Click
+                    var remove_button = document.getElementById( 'remove' );
+                    remove_button.addEventListener('click', function() {
+                        // Remove
+                        var deleted = false;
+                        var remove = function() {
+                            var name = entity.getAttribute('id');
+                            if (deleted === false) {
+                                entity.parentNode.removeChild(entity);
+                                deleted = true;
+                            }
+                        };
+                        // Listener
+                        entity.addEventListener('raycaster-intersected', remove, false);
+                        setTimeout(function() {
+                            entity.removeEventListener('raycaster-intersected', remove, false);
+                        }, 25); 
+                    });   
+                }
+            });
+            
         </script>
         
         <!-- Button -->
         <button type="button" class="button" id="duplicate">DUPLICATE MESH</button>
+        <button type="button" class="button remove" id="remove">REMOVE MESH</button>
         
         <!-- A-Frame Scene -->
         <a-scene>
@@ -67,6 +95,7 @@
             <a-camera> 
                 <a-entity id="raycaster"
                           raycaster
+                          cursor
                           position="0 0 -0.25"
                           geometry="primitive: ring; radius-inner: 0.00001; radius-outer: 0.0025"
                           material="color: #e74c3c; shader: flat"
@@ -91,6 +120,5 @@
                       ></a-entity>
             <a-sky color="#2c3e50"></a-sky>
         </a-scene>
-        
     </body>
 </html>
