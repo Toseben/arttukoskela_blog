@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Decal Component</title>
+        <link rel="stylesheet" href="css/duplicateOnClick.css">
+        <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
+        <script src="js/AFrame.DecalComponent.js"></script>
+        <script src="js/THREE.DecalGeometry.js"></script>
+    </head>
+    
+    <body>
+        
+        <button type="button" class="button" id="decal">DECAL</button>
+        
+        <!-- A-Frame Scene -->
+        <a-scene>
+            
+            <!-- Camera -->
+            <a-camera position="0 -1.5 2.5"> 
+                <a-entity id="raycaster"
+                          raycaster
+                          cursor
+                          position="0 0 -0.25"
+                          geometry="primitive: ring; radius-inner: 0.00001; radius-outer: 0.0025"
+                          material="color: #e74c3c; shader: flat"
+                          ></a-entity>
+            </a-camera>
+            
+
+            <a-sphere id="sphere"
+                      material="wireframe: false; color: #e74c3c"
+                      geometry="segmentsWidth: 50; segmentsHeight: 25; buffer: false"></a-sphere>
+            
+            <a-torus id="torus"
+                      material="wireframe: false; color: #e74c3c"
+                      geometry="buffer: false"></a-torus>
+            
+            <a-entity id="helper" decal></a-entity>
+            
+            <!-- Sky -->
+            <a-sky color="#2980b9"></a-sky>
+        </a-scene>
+    </body>
+</html>
