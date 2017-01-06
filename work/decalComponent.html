@@ -12,66 +12,113 @@
     <body>
         
         <button type="button" class="button" id="decal">DECAL</button>
-        <div class="sliders" id="slider"></div>
-        <span class="example-val" id="value">...</span>
-
+        <button type="button" class="button" id="delete">DELETE</button>
+        
+        <div class="sliders" id="scale_slider"></div>
+        <span class="values" id="scale_value">...</span>
+        
+        <div class="sliders" id="rotation_slider"></div>
+        <span class="values" id="rotation_value">...</span>
+        
+        <script>
+        
+            // Remove
+            AFRAME.registerComponent('remove', {
+                init: function () {
+                    var entity = this.el;
+                    // Click
+                    var remove_button = document.getElementById( 'delete' );
+                    remove_button.addEventListener('click', function() {
+                        // Remove
+                        var deleted = false;
+                        var remove = function() {
+                            if (deleted === false) {
+                                entity.parentNode.removeChild(entity);
+                                deleted = true;
+                            }
+                        };
+                        // Listener
+                        entity.addEventListener('raycaster-intersected', remove, false);
+                        setTimeout(function() {
+                            entity.removeEventListener('raycaster-intersected', remove, false);
+                        }, 25); 
+                    });
+                }
+            });
+        
+        </script>
+        
         <!-- A-Frame Scene -->
         <a-scene>
             
             <!-- Camera -->
             <a-camera position="0 -1.5 2.5"> 
-                <a-entity id="raycaster"
-                          raycaster
-                          cursor
+                <a-entity id="raycaster_create"
+                          raycaster="objects: .clickable"
                           position="0 0 -0.25"
                           geometry="primitive: ring; radius-inner: 0.00001; radius-outer: 0.0025"
                           material="color: #e74c3c; shader: flat"
                           ></a-entity>
+                <a-entity id="raycaster_delete"
+                          raycaster
+                          ></a-entity>
             </a-camera>
             
 
-            <a-sphere id="sphere"
+            <a-sphere id="sphere" class="clickable"
                       material="wireframe: false; color: #e74c3c"
                       geometry="segmentsWidth: 50; segmentsHeight: 25; buffer: false"></a-sphere>
             
-            <a-torus id="torus"
+            <a-torus id="torus" class="clickable"
                       material="wireframe: false; color: #e74c3c"
                       geometry="buffer: false"></a-torus>
             
-            <a-entity id="helper" decal="scale: 1"></a-entity>
+            <a-entity id="helper" decal="scale: 1; rotation: 0"></a-entity>
             
             <!-- Sky -->
             <a-sky color="#2980b9"></a-sky>
         </a-scene>
         
         <script>
-            helper.setAttribute('decal', {
-                scale: 2
-            });
             
             // Sliders
-            var slider = document.getElementById('slider');
+            var scale_slider = document.getElementById('scale_slider');
+            var rotation_slider = document.getElementById('rotation_slider');
 
-            noUiSlider.create(slider, {
+            noUiSlider.create(scale_slider, {
                 start: 1,
                 connect: true,
                 range: {
-                    'min': 0.25,
+                    'min': 0,
                     'max': 2
                 }
             });
             
-            var rangeSliderValueElement = document.getElementById('value');
+            noUiSlider.create(rotation_slider, {
+                start: 180,
+                connect: true,
+                range: {
+                    'min': 0,
+                    'max': 360
+                }
+            });
             
-            slider.noUiSlider.on('update', function( values, handle ) {
-                rangeSliderValueElement.innerHTML = values[handle];
+            var scaleSliderValue = document.getElementById('scale_value');
+            scale_slider.noUiSlider.on('update', function( values, handle ) {
+                scaleSliderValue.innerHTML = values[handle];
                 helper.setAttribute('decal', {
                     scale: values[handle]
                 });
             });
             
+            var rotationSliderValue = document.getElementById('rotation_value');
+            rotation_slider.noUiSlider.on('update', function( values, handle ) {
+                rotationSliderValue.innerHTML = values[handle];
+                helper.setAttribute('decal', {
+                    rotation: values[handle]
+                });
+            });
+            
         </script>
-        
-
     </body>
 </html>

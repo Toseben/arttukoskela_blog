@@ -2,7 +2,8 @@
 AFRAME.registerComponent('decal', {
     dependencies: ['raycaster'],
     schema: { 
-        scale: {default: 1} 
+        scale: {default: 1},
+        rotation: {default: 0}
     },
     
     init: function () {
@@ -16,10 +17,12 @@ AFRAME.registerComponent('decal', {
         var s = new THREE.Vector3( 1, 1, 1 );
         var up = new THREE.Vector3( 0, 1, 0 );
         var check = new THREE.Vector3( 1, 1, 1 );
+        var aframe_scene = this.el.sceneEl;
         
         var params = this.params = {
             scale: this.data.scale,
-            rotate: false
+            rotation: this.data.rotation,
+            rotate: true
         };
         
         // Loaders
@@ -41,6 +44,16 @@ AFRAME.registerComponent('decal', {
             wireframe: false 
         });
         
+        /*// NORMAL MATERIAL
+        decalMaterial = new THREE.MeshNormalMaterial( { 
+            transparent: true, 
+            depthTest: true, 
+            depthWrite: false, 
+            polygonOffset: true,
+            polygonOffsetFactor: -4, 
+            shading: THREE.SmoothShading
+        });*/
+
         // Intersection
         var intersection = {
             point: new THREE.Vector3(),
@@ -49,12 +62,12 @@ AFRAME.registerComponent('decal', {
         
         // Mouse Helper
         var scene = this.el.sceneEl.object3D;
-        mouseHelper = new THREE.Mesh( new THREE.BoxGeometry( 0.1, 0.1, 1 ), new THREE.MeshNormalMaterial() );
+        mouseHelper = this.mouseHelper = new THREE.Mesh( new THREE.BoxGeometry( 0.1, 0.1, 1 ), new THREE.MeshNormalMaterial() );
         scene.add( mouseHelper );
         mouseHelper.visible = true;
         
         // Raycasting
-        var raycaster = document.querySelector("#raycaster");
+        var raycaster = document.querySelector("#raycaster_create");
         raycaster.addEventListener('raycaster-intersection', function (evt) {
             // Position
             var p = evt.detail.intersections[0].point;
@@ -64,13 +77,14 @@ AFRAME.registerComponent('decal', {
             var n = evt.detail.intersections[0].face.normal.clone();
             n.add( p );
             mouseHelper.lookAt( n );
+            mouseHelper.rotation.z = params.rotation * (Math.PI / 180);
             intersection.normal.copy( evt.detail.intersections[0].face.normal );
             // Mesh
             mesh = evt.detail.els[0].getObject3D('mesh');
         });
         
         // Decal Button
-        var button = document.querySelector('button');
+        var button = document.querySelector('#decal');
         button.addEventListener('click', addDecal);
         
         function addDecal() {
@@ -80,12 +94,13 @@ AFRAME.registerComponent('decal', {
             var scale = params.scale;
             s.set( scale, scale, scale );
 
-            if( params.rotate) r.z = Math.random() * 2 * Math.PI;
-            
             var m = new THREE.Mesh( new THREE.DecalGeometry( mesh, p, r, s, check ), decalMaterial );
-            scene.add( m );
+            var entity = document.createElement('a-entity');
+            entity.setAttribute('id', 'decal');
+            entity.setObject3D('mesh', m);
+            entity.setAttribute('remove', true);
+            aframe_scene.appendChild(entity);
         };
-        
     },
     
     update: function (oldData) {
@@ -94,6 +109,7 @@ AFRAME.registerComponent('decal', {
         var data = this.data;
         var params = this.params;
         params.scale = data.scale;
+        params.rotation = data.rotation;
         
     }
 });
