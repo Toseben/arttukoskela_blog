@@ -2,16 +2,19 @@
 <html>
     <head>
         <title>Decal Component</title>
-        <link rel="stylesheet" href="css/duplicateOnClick.css">
+        <link rel="stylesheet" href="css/decalComponent.css">
+        <link rel="stylesheet" href="css/nouislider.min.css">
+        <script src="js/nouislider.min.js"></script>
         <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
         <script src="js/AFrame.DecalComponent.js"></script>
         <script src="js/THREE.DecalGeometry.js"></script>
     </head>
-    
     <body>
         
         <button type="button" class="button" id="decal">DECAL</button>
-        
+        <div class="sliders" id="slider"></div>
+        <span class="example-val" id="value">...</span>
+
         <!-- A-Frame Scene -->
         <a-scene>
             
@@ -35,10 +38,40 @@
                       material="wireframe: false; color: #e74c3c"
                       geometry="buffer: false"></a-torus>
             
-            <a-entity id="helper" decal></a-entity>
+            <a-entity id="helper" decal="scale: 1"></a-entity>
             
             <!-- Sky -->
             <a-sky color="#2980b9"></a-sky>
         </a-scene>
+        
+        <script>
+            helper.setAttribute('decal', {
+                scale: 2
+            });
+            
+            // Sliders
+            var slider = document.getElementById('slider');
+
+            noUiSlider.create(slider, {
+                start: 1,
+                connect: true,
+                range: {
+                    'min': 0.25,
+                    'max': 2
+                }
+            });
+            
+            var rangeSliderValueElement = document.getElementById('value');
+            
+            slider.noUiSlider.on('update', function( values, handle ) {
+                rangeSliderValueElement.innerHTML = values[handle];
+                helper.setAttribute('decal', {
+                    scale: values[handle]
+                });
+            });
+            
+        </script>
+        
+
     </body>
 </html>

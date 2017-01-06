@@ -1,6 +1,9 @@
 // Decal Component
 AFRAME.registerComponent('decal', {
     dependencies: ['raycaster'],
+    schema: { 
+        scale: {type: 'number', default: 1} 
+    },
     
     init: function () {
         
@@ -14,14 +17,32 @@ AFRAME.registerComponent('decal', {
         var up = new THREE.Vector3( 0, 1, 0 );
         var check = new THREE.Vector3( 1, 1, 1 );
         
-        var params = {
-            minScale: 0.5,
-            maxScale: 0.5,
+        /*var params = {
+            scale: this.data.scale,
             rotate: false
-        };
+        };*/
+        
+        var data = this.data;
+        var manager = new THREE.LoadingManager();
+        var loader = new THREE.TextureLoader(manager);
+        
+        // Decal Material
+        var decalMaterial = new THREE.MeshPhongMaterial( { 
+            specular: 0xffffff,
+            shininess: 10,
+            map: loader.load( 'img/ink_color.png' ), 
+            normalMap: loader.load( 'img/ink_normal.jpg' ),
+            normalScale: new THREE.Vector2( .15, .15 ),
+            transparent: true, 
+            depthTest: true, 
+            depthWrite: false, 
+            polygonOffset: true,
+            polygonOffsetFactor: -4, 
+            wireframe: false 
+        });
         
         // Normal Materiel
-        var decalMaterial = new THREE.MeshNormalMaterial( { 
+        /*decalMaterial = new THREE.MeshNormalMaterial( { 
             transparent: true, 
             depthTest: true, 
             depthWrite: false, 
@@ -30,7 +51,7 @@ AFRAME.registerComponent('decal', {
             shading: THREE.SmoothShading,
             side: THREE.DoubleSide,
             wireframe: false
-        });
+        });*/
         
         // Intersection
         var intersection = {
@@ -66,10 +87,10 @@ AFRAME.registerComponent('decal', {
             p = intersection.point;
             r.copy( mouseHelper.rotation );
             
-            var scale = params.minScale + Math.random() * ( params.maxScale - params.minScale );
+            var scale = data.scale;
             s.set( scale, scale, scale );
 
-            if( params.rotate) r.z = Math.random() * 2 * Math.PI;
+            //if( params.rotate) r.z = Math.random() * 2 * Math.PI;
             
             var m = new THREE.Mesh( new THREE.DecalGeometry( mesh, p, r, s, check ), decalMaterial );
             scene.add( m );
