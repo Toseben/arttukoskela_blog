@@ -2,11 +2,11 @@
 AFRAME.registerComponent('decal', {
     dependencies: ['raycaster'],
     schema: { 
-        scale: {type: 'number', default: 1} 
+        scale: {default: 1} 
     },
     
     init: function () {
-        
+
         // Variables
         var mesh;
         var decals = [];
@@ -17,17 +17,17 @@ AFRAME.registerComponent('decal', {
         var up = new THREE.Vector3( 0, 1, 0 );
         var check = new THREE.Vector3( 1, 1, 1 );
         
-        /*var params = {
+        var params = this.params = {
             scale: this.data.scale,
             rotate: false
-        };*/
+        };
         
-        var data = this.data;
+        // Loaders
         var manager = new THREE.LoadingManager();
         var loader = new THREE.TextureLoader(manager);
         
         // Decal Material
-        var decalMaterial = new THREE.MeshPhongMaterial( { 
+        var decalMaterial = this.decalMaterial = new THREE.MeshPhongMaterial( { 
             specular: 0xffffff,
             shininess: 10,
             map: loader.load( 'img/ink_color.png' ), 
@@ -40,18 +40,6 @@ AFRAME.registerComponent('decal', {
             polygonOffsetFactor: -4, 
             wireframe: false 
         });
-        
-        // Normal Materiel
-        /*decalMaterial = new THREE.MeshNormalMaterial( { 
-            transparent: true, 
-            depthTest: true, 
-            depthWrite: false, 
-            polygonOffset: true,
-            polygonOffsetFactor: -4, 
-            shading: THREE.SmoothShading,
-            side: THREE.DoubleSide,
-            wireframe: false
-        });*/
         
         // Intersection
         var intersection = {
@@ -83,17 +71,29 @@ AFRAME.registerComponent('decal', {
         
         // Decal Button
         var button = document.querySelector('button');
-        button.addEventListener('click', function() {
+        button.addEventListener('click', addDecal);
+        
+        function addDecal() {
             p = intersection.point;
             r.copy( mouseHelper.rotation );
             
-            var scale = data.scale;
+            var scale = params.scale;
             s.set( scale, scale, scale );
 
-            //if( params.rotate) r.z = Math.random() * 2 * Math.PI;
+            if( params.rotate) r.z = Math.random() * 2 * Math.PI;
             
             var m = new THREE.Mesh( new THREE.DecalGeometry( mesh, p, r, s, check ), decalMaterial );
             scene.add( m );
-        });
+        };
+        
+    },
+    
+    update: function (oldData) {
+        
+        // Variables
+        var data = this.data;
+        var params = this.params;
+        params.scale = data.scale;
+        
     }
 });
