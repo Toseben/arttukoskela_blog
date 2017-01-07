@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Texture Upload</title>
+        <link rel="stylesheet" href="css/dropzone.css" />
+        <link rel="stylesheet" href="css/textureUpload.css" />
+    </head>
+<body>
+    
+    <script src="js/three.min.js"></script>
+    <script src="js/dropzone.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    
+    <div id="dropzone">
+        <form action="/upload" class="dropzone needsclick dz-clickable" id="dropzone">
+            <div class="dz-message needsclick">Drop files here or click to upload.</div>
+        </form>
+    </div>
+
+    <input id="userImage" type="file">
+    <div id="container" style="position: absolute; left: 0px; top: 0px"></div>
+    
+    <script type="x-shader/x-vertex" id="vertexShader">
+        varying vec2 vUv;
+
+        void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        }
+    </script>
+    
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        precision highp float;
+
+        varying vec2 vUv;
+        uniform sampler2D texture1;
+        void main() {
+            gl_FragColor = texture2D(texture1, vUv.xy);
+        }
+    </script>
+
+    <script>
+        $("#userImage").change(function () {
+            // IMAGE
+            var image = document.createElement( 'img' );
+            var texture = new THREE.Texture( image );
+            image.onload = function()  {
+                    console.log("Loaded!");
+                    texture.needsUpdate = true;
+                };
+            
+            userImage = $("#userImage")[0];
+            if (userImage.files && userImage.files[0]) {
+                var reader = new FileReader();
+                
+                reader.onload = function (e) {
+                    image.src = e.target.result;
+                };
+
+                reader.readAsDataURL(userImage.files[0]);
+            }
+            // SCENE
+            scene = new THREE.Scene();
+            // CAMERA
+            var w = window.innerWidth, h = window.innerHeight;
+            camera = new THREE.PerspectiveCamera( 60, w / h, 0.1, 1000 );
+            scene.add( camera );
+            camera.position.set( 0, 2, 4 );
+            camera.lookAt( scene.position );
+            // RENDERER
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize( w, h );
+            // SKYBOX
+            var skyBoxGeometry = new THREE.CubeGeometry( 100, 100, 100 );
+            var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x6fcb9f, side: THREE.BackSide } );
+            var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+            scene.add( skyBox );
+            // SHADER
+            var shader = new THREE.ShaderMaterial({
+                    vertexShader: document.getElementById('vertexShader').textContent,
+                    fragmentShader: document.getElementById('fragmentShader').textContent,
+                    uniforms: {
+                        texture1: {
+                            type: "t",
+                            value: texture
+                        }
+                    }
+                });
+            // CONTAINER
+            var container = document.querySelector('#container');
+            container.appendChild( renderer.domElement );
+            // GEOMETRY
+            var geometry = new THREE.TorusGeometry( 1, 0.5, 50, 100 );
+            var obj = new THREE.Mesh( geometry, shader );
+            scene.add( obj );
+            // RENDER
+            animate();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                renderer.render(scene, camera);
+            }
+        });
+    </script>
+</body>
+</html>
