@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+   <title>Head Tracking</title>
+   <script src="https://aframe.io/releases/0.2.0/aframe.min.js"></script>
+</head>
+<body>
+
+   <a-scene id="main-scene">
+
+      <a-assets>
+         <a-mixin id="box" material="color: #0496ff" rotation="0 0 45" geometry="height: .3; width: .3; depth: .3"></a-mixin>
+      </a-assets>
+
+      <!-- Global Settings -->
+      <a-sky color="#ccc"></a-sky>
+      <a-light type="ambient" color="#ccc" intensity=".1"></a-light>
+      <a-light type="directional" color="#fff" position="1 1 .5" intensity="1"></a-light>
+      <a-image id="ground" position="0 -.025 0" height="25" width="25" rotation="90 0 0" src="img/uv.jpg"></a-image>
+
+      <!-- Human Camera -->
+      <a-entity position="0 1.75 0">
+         <a-camera id="human-camera" wasd-controls-enabled="true" look-controls-enabled="true" 
+                   mouse-controls active="true" near="0.1">
+            <a-entity id="raycaster"
+                      position="0 0 -0.5"
+                      geometry="primitive: ring; radius-inner: 0.00001; radius-outer: 0.025"
+                      material="color: #ebff00; shader: flat"
+                      ></a-entity>
+            <a-entity position="0 0 -1.5" id="target">
+               <a-box mixin="box" position="0 0 0"></a-box>
+               <a-box mixin="box" position="-0.6 0 0"></a-box>
+               <a-box mixin="box" position="0.6 0 0"></a-box>
+            </a-entity>
+         </a-camera>
+      </a-entity>
+
+   </a-scene>
+
+   <script>
+
+      var scene = document.querySelector('a-scene');
+      scene.addEventListener('loaded', function(){
+         // Initially set the camera object
+         setCameraAttributes();
+
+         // Setup observer
+         setObserver();
+      });
+
+      // Create a camera object
+      var camera = {
+         el: document.querySelector('#human-camera'),
+         x: 0,
+         y: 0,
+         z: 0
+      }
+
+      // Set target object
+      var target = document.getElementById('target');
+
+      // Set global observer and creation function
+      var observer = undefined;
+      function setObserver(){
+
+         // Disconnect existing observer
+         if(observer != undefined)
+            observer.disconnect();
+
+         // Observe the changes to the camera
+         observer = new MutationObserver(function(transformations){
+            // For each element in transformations (which comes from the MutationObserver), set camera attributes and update the target
+            transformations.forEach(function(transformation){
+               setCameraAttributes();
+               target.setAttribute('rotation', cameraRotationScalar(camera, [-4, -3, 1]));
+            });
+         });
+
+         // I don't know what I'm doing here, Mozilla's docs told me to do it
+         var observerConfig = {
+            attributes:    true,
+            childList:     true,
+            characterData: true
+         }
+
+         // Set up the observer
+         observer.observe(camera.el, observerConfig);
+
+         // Pass it on up so it is available next time
+         return observer;
+      }
+
+      // Set the camera attributes
+      function setCameraAttributes(){
+
+         var humanCameraRotation = camera.el.getAttribute('rotation');
+         camera.x = humanCameraRotation.x;
+         camera.y = humanCameraRotation.y;
+         camera.z = humanCameraRotation.z;
+
+      }
+
+      function cameraRotationScalar(camera, cameraScalar){
+         return camera.x*cameraScalar[0] + " " + camera.y*cameraScalar[1] + " " + camera.z*cameraScalar[2];
+      }
+
+   </script>
+   </body>
+</html>
