@@ -47,3 +47,10 @@
 #rotation_value {
     top: 275px;
 }
+
+#userImage {
+    position: absolute;
+    left: 0;
+    top: 325px;
+    z-index: 10;
+}

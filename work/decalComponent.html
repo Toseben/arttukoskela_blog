@@ -5,20 +5,23 @@
         <link rel="stylesheet" href="css/decalComponent.css">
         <link rel="stylesheet" href="css/nouislider.min.css">
         <script src="js/nouislider.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
         <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
         <script src="js/AFrame.DecalComponent.js"></script>
         <script src="js/THREE.DecalGeometry.js"></script>
     </head>
     <body>
         
-        <button type="button" class="button" id="decal">DECAL</button>
-        <button type="button" class="button" id="delete">DELETE</button>
+        <button type="button" class="button" id="decal">ADD</button>
+        <button type="button" class="button" id="delete">REMOVE</button>
         
         <div class="sliders" id="scale_slider"></div>
         <span class="values" id="scale_value">...</span>
         
         <div class="sliders" id="rotation_slider"></div>
         <span class="values" id="rotation_value">...</span>
+        
+        <input id="userImage" type="file">
         
         <script>
         
@@ -118,6 +121,31 @@
                     rotation: values[handle]
                 });
             });
+            
+            /*$("#userImage").change(function () {
+                // IMAGE
+                var image = document.createElement( 'img' );
+                var texture = new THREE.Texture( image );
+                image.onload = function()  {
+                        console.log("Loaded!");
+                        console.log(texture);
+                        texture.needsUpdate = true;
+                        helper.setAttribute('decal', {
+                            texture: texture
+                        });
+                    };
+
+                userImage = $("#userImage")[0];
+                if (userImage.files && userImage.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        image.src = e.target.result;
+                    };
+
+                    reader.readAsDataURL(userImage.files[0]);
+                }
+            });*/
             
         </script>
     </body>

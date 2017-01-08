@@ -7,7 +7,31 @@ AFRAME.registerComponent('decal', {
     },
     
     init: function () {
+        
+        // Change Image
+        $("#userImage").change(function () {
+            // IMAGE
+            var image = document.createElement( 'img' );
+            var texture = new THREE.Texture( image );
+            image.onload = function()  {
+                    texture.needsUpdate = true;
+                    console.log("Loaded!");
+                    decalMaterial.map = texture;
+                    decalMaterial.map.NeedsUpdate = true;
+                };
 
+            userImage = $("#userImage")[0];
+            if (userImage.files && userImage.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    image.src = e.target.result;
+                };
+
+                reader.readAsDataURL(userImage.files[0]);
+            }
+        });
+        
         // Variables
         var mesh;
         var decals = [];
@@ -93,7 +117,7 @@ AFRAME.registerComponent('decal', {
             
             var scale = params.scale;
             s.set( scale, scale, scale );
-
+            
             var m = new THREE.Mesh( new THREE.DecalGeometry( mesh, p, r, s, check ), decalMaterial );
             var entity = document.createElement('a-entity');
             entity.setAttribute('id', 'decal');
