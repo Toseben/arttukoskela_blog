@@ -48,6 +48,25 @@
                     });
                 }
             });
+            
+        function camRotScalar(camRot, camScalar){
+            return camRot.x*camScalar[0] + " " + camRot.y*camScalar[1] + " " + camRot.z*camScalar[2];
+        }
+        
+        AFRAME.registerComponent('orient', {
+        
+            init: function () {
+                var cam = this.cam = document.getElementById('camera');
+                var target = this.target = this.el;
+            },
+            
+            tick: function (time) {
+                var camRot = this.cam.getAttribute('rotation');
+                var camRotScaled = camRotScalar(camRot, [-1, -1, 1]);
+                this.target.setAttribute('rotation', camRotScaled);
+            }
+            
+        });
         
         </script>
         
@@ -55,31 +74,35 @@
         <a-scene>
             
             <!-- Camera -->
-            <a-camera position="0 -1.5 2.5"> 
+            <a-camera id="camera" position="0 -1.6 0"> 
+                
                 <a-entity id="raycaster_create"
                           raycaster="objects: .clickable"
                           position="0 0 -0.25"
                           geometry="primitive: ring; radius-inner: 0.00001; radius-outer: 0.0025"
                           material="color: #e74c3c; shader: flat"
                           ></a-entity>
+                
                 <a-entity id="raycaster_delete"
                           raycaster
                           ></a-entity>
+                
+                <a-entity position="0 0 -3" id="target" orient>
+                    
+                    <a-sphere id="sphere" class="clickable"
+                              material="wireframe: false; color: #e74c3c"
+                              geometry="segmentsWidth: 50; segmentsHeight: 25; buffer: false"></a-sphere>
+
+                    <a-torus id="torus" class="clickable"
+                              material="wireframe: false; color: #e74c3c"
+                              geometry="buffer: false"></a-torus>
+
+                    <a-entity id="helper" decal="scale: 1; rotation: 0"></a-entity>
+                    
+                </a-entity>
+                
             </a-camera>
-            
-            <a-entity>
-                <a-sphere id="sphere" class="clickable"
-                          material="wireframe: false; color: #e74c3c"
-                          geometry="segmentsWidth: 50; segmentsHeight: 25; buffer: false"></a-sphere>
 
-                <a-torus id="torus" class="clickable"
-                          material="wireframe: false; color: #e74c3c"
-                          geometry="buffer: false"></a-torus>
-
-                <a-entity id="helper" decal="scale: 1; rotation: 0"></a-entity>
-            </a-entity>
-            
-            <!-- Sky -->
             <a-sky color="#2980b9"></a-sky>
         </a-scene>
         

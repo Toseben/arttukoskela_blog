@@ -33,7 +33,7 @@ AFRAME.registerComponent('decal', {
         });
         
         // Variables
-        var mesh;
+        var mesh, ray_entity;
         var decals = [];
         var decalHelper, mouseHelper;
         var p = new THREE.Vector3( 0, 0, 0 );
@@ -41,7 +41,8 @@ AFRAME.registerComponent('decal', {
         var s = new THREE.Vector3( 1, 1, 1 );
         var up = new THREE.Vector3( 0, 1, 0 );
         var check = new THREE.Vector3( 1, 1, 1 );
-        var aframe_scene = this.el.sceneEl;
+        var container = this.el;
+        var aframe_scene = container.sceneEl;
         
         var params = this.params = {
             scale: this.data.scale,
@@ -104,7 +105,8 @@ AFRAME.registerComponent('decal', {
             mouseHelper.rotation.z = params.rotation * (Math.PI / 180);
             intersection.normal.copy( evt.detail.intersections[0].face.normal );
             // Mesh
-            mesh = evt.detail.els[0].getObject3D('mesh');
+            ray_entity = evt.detail.els[0];
+            mesh = ray_entity.getObject3D('mesh');
         });
         
         // Decal Button
@@ -113,6 +115,10 @@ AFRAME.registerComponent('decal', {
         
         function addDecal() {
             p = intersection.point;
+            var ray_entity_group = ray_entity.object3D;
+            ray_entity_group.updateMatrixWorld();
+            p = ray_entity_group.worldToLocal(p);
+            
             r.copy( mouseHelper.rotation );
             
             var scale = params.scale;
@@ -123,7 +129,7 @@ AFRAME.registerComponent('decal', {
             entity.setAttribute('id', 'decal');
             entity.setObject3D('mesh', m);
             entity.setAttribute('remove', true);
-            aframe_scene.appendChild(entity);
+            container.appendChild(entity);
         };
     },
     

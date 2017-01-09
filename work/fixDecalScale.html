@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Decal Component</title>
+        <link rel="stylesheet" href="css/decalComponent.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
+    </head>
+    <body>
+        
+        <button type="button" class="button" id="decal">ADD</button>
+        
+        <script>
+        
+        // Decal Component
+        AFRAME.registerComponent('decal', {
+            dependencies: ['raycaster'],
+
+            init: function () {
+
+                // Variables
+                var ray_entity;
+                var mesh;
+                var decals = [];
+                var decalHelper, mouseHelper;
+                var p = new THREE.Vector3( 0, 0, 0 );
+                var r = new THREE.Vector3( 0, 0, 0 );
+                var s = new THREE.Vector3( 1, 1, 1 );
+                var up = new THREE.Vector3( 0, 1, 0 );
+                var check = new THREE.Vector3( 1, 1, 1 );
+                var aframe_scene = this.el.sceneEl;
+                var decal_container = this.el;
+
+                // Decal Material
+                var decalMaterial = this.decalMaterial = new THREE.MeshPhongMaterial();
+
+                // Intersection
+                var intersection = {
+                    point: new THREE.Vector3(),
+                    normal: new THREE.Vector3()
+                };
+
+                // Mouse Helper
+                var scene = this.el.sceneEl.object3D;
+                mouseHelper = this.mouseHelper = new THREE.Mesh( new THREE.BoxGeometry( 0.1, 0.1, 1 ), new THREE.MeshNormalMaterial() );
+                scene.add( mouseHelper );
+                mouseHelper.visible = true;
+
+                // Raycasting
+                var raycaster = document.querySelector("#raycaster_create");
+                raycaster.addEventListener('raycaster-intersection', function (evt) {
+                    // Position
+                    var p = evt.detail.intersections[0].point;
+                    mouseHelper.position.copy( p );
+                    intersection.point.copy( p );
+                    // Normal
+                    var n = evt.detail.intersections[0].face.normal.clone();
+                    n.add( p );
+                    mouseHelper.lookAt( n );
+                    intersection.normal.copy( evt.detail.intersections[0].face.normal );
+                    // Mesh
+                    ray_entity = evt.detail.els[0].parentElement;
+                    mesh = evt.detail.els[0].getObject3D('mesh');
+                });
+
+                // Decal Button
+                var button = document.querySelector('#decal');
+                button.addEventListener('click', addDecal);
+
+                function addDecal() {
+                    var scalar = ray_entity.getAttribute('scale');
+                    p = intersection.point;
+                    var ray_entity_group = ray_entity.object3D;
+                    ray_entity_group.updateMatrixWorld();
+                    
+                    p = ray_entity_group.worldToLocal(p);
+                    console.log(p);
+                    //p = { x: p.x / scalar.x, y: p.y / scalar.y, z: p.z / scalar.z }
+                    var m = new THREE.Mesh( new THREE.SphereGeometry( 0.1, 32, 32 ), decalMaterial );
+                    m.position.set(p.x, p.y, p.z);
+                    var entity = document.createElement('a-entity');
+                    entity.setAttribute('id', 'decal');
+                    entity.setAttribute('scale', { x: scalar.x, y: scalar.y, z: scalar.z })
+                    entity.setObject3D('mesh', m);
+                    decal_container.appendChild(entity);
+                };
+            }
+        });
+        
+        function camRotScalar(camRot, camScalar){
+            return camRot.x*camScalar[0] + " " + camRot.y*camScalar[1] + " " + camRot.z*camScalar[2];
+        }
+        
+        AFRAME.registerComponent('orient', {
+        
+            init: function () {
+                var cam = this.cam = document.getElementById('camera');
+                var target = this.target = this.el;
+            },
+            
+            tick: function (time) {
+                var camRot = this.cam.getAttribute('rotation');
+                var camRotScaled = camRotScalar(camRot, [-1, -1, 1]);
+                this.target.setAttribute('rotation', camRotScaled);
+            }
+            
+        });
+            
+        </script>
+        
+        <!-- A-Frame Scene -->
+        <a-scene>
+            
+            <!-- Camera -->
+            <a-camera id="camera" position="0 -1.6 0"> 
+                
+                <a-entity id="raycaster_create"
+                          raycaster="objects: .clickable"
+                          position="0 0 -0.25"
+                          geometry="primitive: ring; radius-inner: 0.00001; radius-outer: 0.0025"
+                          material="color: #e74c3c; shader: flat"
+                          ></a-entity>
+
+                <a-entity position="0 0 -2" id="target" orient>
+
+                    <a-box id="box_1" class="clickable" position="0 0 0"
+                              material="wireframe: false; color: #e74c3c"
+                              geometry="segmentsWidth: 50; segmentsHeight: 25; buffer: false"></a-box>
+
+                    <a-entity id="helper" decal></a-entity>
+
+                </a-entity>
+                
+            </a-camera>
+            
+            <a-sky color="#2980b9"></a-sky>
+        </a-scene>
+        
+    </body>
+</html>
