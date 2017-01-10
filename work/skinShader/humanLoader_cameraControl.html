@@ -2,100 +2,37 @@
 <html>
     <head>
         <title>Human Loader</title>
+        <link rel="stylesheet" href="css/humanLoader.css">
+        <link rel="stylesheet" href="css/nouislider.min.css">
+        
         <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
         
+        <script src="js/nouislider.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="js/AFrame.DecalComponent.js"></script>
+        <script src="js/THREE.DecalGeometry.js"></script>
+        
         <script src="js/ShaderSkin.js"></script>
+        <script src="js/skinShader_component.js"></script>
         <script src="js/shaders/CopyShader.js"></script>
         <script src="js/postprocessing/EffectComposer.js"></script>
         <script src="js/postprocessing/ShaderPass.js"></script>
     </head>
     <body>
         
-        <script>
+        <button type="button" class="button" id="plus">+</button>
+        <button type="button" class="button" id="minus">-</button>
         
-        // SKIN SHADER
-        AFRAME.registerShader('skin', {
-            init: function (data) {
-                var entity = this;
-                var scene = this.el.sceneEl;
-                
-                // INIT
-                var renderer, uniforms;
-                
-                // RENDERER
-                scene.addEventListener('render-target-loaded', function () {
-                    renderer = scene.renderer;
-                    renderer.autoClear = false;
-                    
-                    renderer.gammaInput = true;
-				    renderer.gammaOutput = true;
-                    
-                    var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
-                    var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
-
-                    var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
-                    var rtwidth = 512, rtheight = 512;
-
-                    composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
-                    composerBeckmann.addPass( effectBeckmann );
-                    composerBeckmann.addPass( effectCopy );
-                    
-                    // UPDATE UNIFORM
-                    composerBeckmann.render();
-                    uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1.texture;
-                });
-                
-                // TEXTURE
-                var textureLoader = new THREE.TextureLoader();
-
-				var mapHeight = textureLoader.load( "human_spec.jpg" );
-
-				mapHeight.anisotropy = 4;
-				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
-				mapHeight.format = THREE.RGBFormat;
-
-				var mapSpecular = textureLoader.load( "human_spec.jpg" );
-
-				mapSpecular.anisotropy = 4;
-				mapSpecular.wrapS = mapSpecular.wrapT = THREE.RepeatWrapping;
-				mapSpecular.format = THREE.RGBFormat;
-
-				var mapColor = textureLoader.load( "human_col.jpg" );
-
-				mapColor.anisotropy = 4;
-				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;
-				mapColor.format = THREE.RGBFormat;
-
-				var shader = THREE.ShaderSkin[ "skinSimple" ];
-
-				var fragmentShader = shader.fragmentShader;
-				var vertexShader = shader.vertexShader;
-                
-                // UNIFORMS
-				uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-            
-				uniforms[ "enableBump" ].value = true;
-				uniforms[ "enableSpecular" ].value = true;
-
-				uniforms[ "tDiffuse" ].value = mapColor;
-
-				uniforms[ "bumpMap" ].value = mapHeight;
-				uniforms[ "specularMap" ].value = mapSpecular;
-
-				uniforms[ "diffuse" ].value.setHex( 0xffffff );
-				uniforms[ "specular" ].value.setHex( 0xffffff );
-
-				uniforms[ "uRoughness" ].value = 0.25;
-				uniforms[ "uSpecularBrightness" ].value = 1.5;
-
-				uniforms[ "bumpScale" ].value = 0.01;
-                
-                // MATERIAL
-				var material = new THREE.ShaderMaterial( { fragmentShader: fragmentShader, vertexShader: vertexShader, uniforms: uniforms, lights: true } );
-				material.extensions.derivatives = true;
-                entity.material = material;
-            }
-        });
+        <button type="button" class="button" id="add">ADD</button>
+        <button type="button" class="button" id="remove">REMOVE</button>
+        
+        <div class="sliders" id="scale_slider"></div>
+        <div class="sliders" id="rotation_slider"></div>
+        
+        <span class="values" id="scale_value">...</span>
+        <span class="values" id="rotation_value">...</span>
+        
+        <script>
         
         function fit(num, oldMin, oldMax, newMin, newMax) {
             var oldRange = (oldMax - oldMin);
@@ -108,30 +45,28 @@
             return Math.max( min, Math.min ( num, max ));
         }
             
-        
-            
         AFRAME.registerComponent('orient', {
         
             init: function () {
                 var cam = this.cam = this.el;
                 var horPos = this.horPos = 0;
-                var human = this.human = document.getElementById('human');
+                var human = this.human = document.getElementById('target');
             },
             
             tick: function (time) {
                 // MOVE CAMERA
                 var camPos = this.cam.getAttribute('position');
                 var camRot = this.cam.getAttribute('rotation');
-                var y_axis_speed = 0.005;
+                var y_axis_speed = 0.02;
                 var y_axis_mult;
                 var x_pos, z_pos;
                 
                 var humanRot = this.human.getAttribute('rotation');
-                var human_speed = 0.5;
+                var human_speed = 2.0;
                 
                 var y_activate = Math.abs(camRot.x);
                 y_activate = Math.pow(y_activate, 2);
-                y_activate = fit(y_activate, 50, 1000, 0, 1);
+                y_activate = fit(y_activate, 100, 2000, 0, 1);
                 y_activate = clamp(y_activate, 0, 1);
                 
                 var x_activate = Math.abs(camRot.y);
@@ -166,20 +101,133 @@
             }
         });
             
+        AFRAME.registerComponent('remove', {
+            init: function () {
+                var entity = this.el;
+                // Click
+                var remove_button = document.getElementById( 'remove' );
+                remove_button.addEventListener('click', function() {
+                    // Remove
+                    var deleted = false;
+                    var remove = function() {
+                        if (deleted === false) {
+                            entity.parentNode.removeChild(entity);
+                            deleted = true;
+                        }
+                    };
+                    // Listener
+                    entity.addEventListener('raycaster-intersected', remove, false);
+                    setTimeout(function() {
+                        entity.removeEventListener('raycaster-intersected', remove, false);
+                    }, 25); 
+                });
+            }
+        });
+            
         </script>
         
-        <a-scene>
+        <a-scene antialias="false">
             <a-assets>
                 <a-asset-item id="human_obj" src="human.OBJ"></a-asset-item>
             </a-assets>
+            
+            <!-- CAMERA AND RAYCASTER -->
+            <a-camera id="camera" position="0 0 1" near="0.001" 
+                      wasd-controls="enabled: false" orient>
                 
-            <a-camera position="0 0 1" wasd-controls="enabled: false" orient></a-camera>
+                <a-entity id="raycaster_add"
+                          raycaster="objects: .clickable"
+                          position="0 0 -0.01"
+                          geometry="primitive: ring; radius-inner: 0.000001; radius-outer: 0.0001"
+                          material="color: #e74c3c; shader: flat"
+                          ></a-entity>
+                
+                <a-entity id="raycaster_delete"
+                          raycaster="objects: .removable"
+                          ></a-entity>
+                
+            </a-camera>
+            
+            <!-- LIGHTS AND BG -->
             <a-entity light="type: ambient; color: #333344"></a-entity>
             <a-entity light="type: directional; color: #FFF" position="1 0 1"></a-entity>
-
+            
             <a-sky color="#2980b9"></a-sky>
-            <a-entity id="human" obj-model="obj: #human_obj" 
-                      material="shader: skin" position="0 1 0"></a-entity>
+            
+            <!-- HUMAN AND DECAL -->
+            <a-entity id="target">
+                <a-entity id="human" obj-model="obj: #human_obj" class="clickable"
+                          material="shader: skin" position="0 1 0"></a-entity>
+                <a-entity id="helper" decal></a-entity>
+            </a-entity>
+            
         </a-scene>
+        
+        <script>
+            
+            // SLIDERS
+            init_slider();
+            function init_slider() {
+                
+                // Sliders
+                var scale_slider = document.getElementById('scale_slider');
+                var rotation_slider = document.getElementById('rotation_slider');
+
+                noUiSlider.create(scale_slider, {
+                    start: 0.1,
+                    connect: true,
+                    range: {
+                        'min': 0,
+                        'max': 0.25
+                    }
+                });
+
+                noUiSlider.create(rotation_slider, {
+                    start: 180,
+                    connect: true,
+                    range: {
+                        'min': 0,
+                        'max': 360
+                    }
+                });
+
+                var scaleSliderValue = document.getElementById('scale_value');
+                scale_slider.noUiSlider.on('update', function( values, handle ) {
+                    scaleSliderValue.innerHTML = values[handle];
+                    helper.setAttribute('decal', {
+                        scale: values[handle]
+                    });
+                });
+
+                var rotationSliderValue = document.getElementById('rotation_value');
+                rotation_slider.noUiSlider.on('update', function( values, handle ) {
+                    rotationSliderValue.innerHTML = values[handle];
+                    helper.setAttribute('decal', {
+                        rotation: values[handle]
+                    });
+                });
+                
+            }
+            
+            // PLUS AND MINUS
+            var cam = document.getElementById( 'camera' );
+            var plus_button = document.getElementById( 'plus' );
+            plus_button.addEventListener('click', function() {
+                var camPos = cam.getAttribute('position');
+                if (camPos.z > 0.5) {
+                    cam.setAttribute('position', { x: camPos.x, y: camPos.y, z: camPos.z - 0.25 });
+                }
+            });
+
+            var minus_button = document.getElementById( 'minus' );
+            minus_button.addEventListener('click', function() {
+                var camPos = cam.getAttribute('position');
+                if (camPos.z < 2) {
+                    cam.setAttribute('position', { x: camPos.x, y: camPos.y, z: camPos.z + 0.25 });
+                }
+            });
+        
+        </script>
+        
     </body>
 </html>

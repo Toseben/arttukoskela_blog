@@ -1,0 +1,69 @@
+.button {
+    border: none;
+    color: white;
+    padding: 15px 15px;
+    margin: 15px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 30px;
+    font-weight: bold;
+    position: absolute;
+    width: 100px;
+    left: 0;
+    z-index: 10;
+    background-color: #4caf57;
+}
+
+#plus {
+    top: 0px;
+}
+
+#minus {
+    left: 120px;
+}
+
+#add {
+    top: 80px;
+    width: 220px;
+    font-size: 20px;
+}
+
+#remove {
+    top: 150px;
+    width: 220px;
+    font-size: 20px;
+}
+
+.sliders {
+    left: 0;
+    z-index: 10;
+    width: 220px;
+    margin: 15px 15px;
+}
+
+.values {
+    position: absolute;
+    left: 0;
+    z-index: 10;
+    padding-left: 80px;
+    margin: 15px 15px;
+}
+
+#scale_slider {
+    position: absolute;
+    top: 220px;
+}
+
+#scale_value {
+    top: 260px;
+}
+
+#rotation_slider {
+    position: absolute;
+    top: 300px;
+}
+
+#rotation_value {
+    top: 340px;
+}
