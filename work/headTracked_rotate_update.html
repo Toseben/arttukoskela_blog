@@ -50,7 +50,8 @@
                       material="color: #ebff00; shader: flat"
                       ></a-entity>
              
-            <a-entity position="0 0 -3" id="target" orient>
+            <a-entity position="0 -1 -3" id="target" orient>
+                <!--
                 <a-sphere id="sphere" class="clickable"
                           material="wireframe: false; color: #e74c3c"
                           geometry="segmentsWidth: 50; segmentsHeight: 25; buffer: false"></a-sphere>
@@ -58,6 +59,11 @@
                 <a-torus id="torus" class="clickable"
                           material="wireframe: false; color: #e74c3c"
                           geometry="buffer: false"></a-torus>
+                -->
+                
+                <a-entity id="human" obj-model="obj: url(geo/human_001.obj)" class="clickable"
+                          material="wireframe: false; color: #e74c3c; side: double"
+                          geometry="buffer: false"></a-entity>
             </a-entity>
              
             </a-camera>

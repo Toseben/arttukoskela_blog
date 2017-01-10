@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Human Loader</title>
+        <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
+        
+        <script src="js/ShaderSkin.js"></script>
+        <script src="js/shaders/CopyShader.js"></script>
+        <script src="js/postprocessing/EffectComposer.js"></script>
+        <script src="js/postprocessing/ShaderPass.js"></script>
+    </head>
+    <body>
+        
+        <script>
+        
+        // SKIN SHADER
+        AFRAME.registerShader('skin', {
+            init: function (data) {
+                var entity = this;
+                var scene = this.el.sceneEl;
+                
+                // INIT
+                var renderer, uniforms;
+                
+                // RENDERER
+                scene.addEventListener('render-target-loaded', function () {
+                    renderer = scene.renderer;
+                    renderer.autoClear = false;
+                    
+                    renderer.gammaInput = true;
+				    renderer.gammaOutput = true;
+                    
+                    var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
+                    var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
+
+                    var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+                    var rtwidth = 512, rtheight = 512;
+
+                    composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
+                    composerBeckmann.addPass( effectBeckmann );
+                    composerBeckmann.addPass( effectCopy );
+                    
+                    // UPDATE UNIFORM
+                    composerBeckmann.render();
+                    uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1.texture;
+                });
+                
+                // TEXTURE
+                var textureLoader = new THREE.TextureLoader();
+
+				var mapHeight = textureLoader.load( "human_spec.jpg" );
+
+				mapHeight.anisotropy = 4;
+				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+				mapHeight.format = THREE.RGBFormat;
+
+				var mapSpecular = textureLoader.load( "human_spec.jpg" );
+
+				mapSpecular.anisotropy = 4;
+				mapSpecular.wrapS = mapSpecular.wrapT = THREE.RepeatWrapping;
+				mapSpecular.format = THREE.RGBFormat;
+
+				var mapColor = textureLoader.load( "human_col.jpg" );
+
+				mapColor.anisotropy = 4;
+				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;
+				mapColor.format = THREE.RGBFormat;
+
+				var shader = THREE.ShaderSkin[ "skinSimple" ];
+
+				var fragmentShader = shader.fragmentShader;
+				var vertexShader = shader.vertexShader;
+                
+                // UNIFORMS
+				uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+            
+				uniforms[ "enableBump" ].value = true;
+				uniforms[ "enableSpecular" ].value = true;
+
+				uniforms[ "tDiffuse" ].value = mapColor;
+
+				uniforms[ "bumpMap" ].value = mapHeight;
+				uniforms[ "specularMap" ].value = mapSpecular;
+
+				uniforms[ "diffuse" ].value.setHex( 0xffffff );
+				uniforms[ "specular" ].value.setHex( 0xffffff );
+
+				uniforms[ "uRoughness" ].value = 0.25;
+				uniforms[ "uSpecularBrightness" ].value = 1.5;
+
+				uniforms[ "bumpScale" ].value = 0.01;
+                
+                // MATERIAL
+				var material = new THREE.ShaderMaterial( { fragmentShader: fragmentShader, vertexShader: vertexShader, uniforms: uniforms, lights: true } );
+				material.extensions.derivatives = true;
+                entity.material = material;
+            }
+        });
+        
+        function fit(num, oldMin, oldMax, newMin, newMax) {
+            var oldRange = (oldMax - oldMin);
+            var newRange = (newMax - newMin);
+            var scaledNum = (((num - oldMin) * newRange) / oldRange) + newMin;
+            return scaledNum;
+        }
+         
+        function clamp(num, min, max) {
+            return Math.max( min, Math.min ( num, max ));
+        }
+            
+        
+            
+        AFRAME.registerComponent('orient', {
+        
+            init: function () {
+                var cam = this.cam = this.el;
+                var horPos = this.horPos = 0;
+                var human = this.human = document.getElementById('human');
+            },
+            
+            tick: function (time) {
+                // MOVE CAMERA
+                var camPos = this.cam.getAttribute('position');
+                var camRot = this.cam.getAttribute('rotation');
+                var y_axis_speed = 0.005;
+                var y_axis_mult;
+                var x_pos, z_pos;
+                
+                var humanRot = this.human.getAttribute('rotation');
+                var human_speed = 0.5;
+                
+                var y_activate = Math.abs(camRot.x);
+                y_activate = Math.pow(y_activate, 2);
+                y_activate = fit(y_activate, 50, 1000, 0, 1);
+                y_activate = clamp(y_activate, 0, 1);
+                
+                var x_activate = Math.abs(camRot.y);
+                x_activate = Math.pow(x_activate, 2);
+                x_activate = fit(x_activate, 100, 2000, 0, 1);
+                x_activate = clamp(x_activate, 0, 1);
+
+                if (camRot.x > 0) {
+                    y_axis_mult = fit(camPos.y, 1.5, 2, 1, 0);
+                    y_axis_mult = clamp(y_axis_mult, 0, 1);
+                    var speed = y_axis_speed * y_axis_mult * y_activate;
+                    this.cam.setAttribute('position', { x: camPos.x, y: camPos.y + speed, z: camPos.z });
+                }
+                
+                if (camRot.x < 0) {
+                    y_axis_mult = fit(camPos.y, 0, 0.5, 0, 1);
+                    y_axis_mult = clamp(y_axis_mult, 0, 1);
+                    var speed = y_axis_speed * y_axis_mult * y_activate;
+                    this.cam.setAttribute('position', { x: camPos.x, y: camPos.y - speed, z: camPos.z });
+                }
+                
+                if (camRot.y > 0) {
+                    var speed = human_speed * x_activate;
+                    this.human.setAttribute('rotation', { x: humanRot.x, y: humanRot.y + speed, z: humanRot.z });
+                }
+                
+                if (camRot.y < 0) {
+                    var speed = human_speed * x_activate;
+                    this.human.setAttribute('rotation', { x: humanRot.x, y: humanRot.y - speed, z: humanRot.z });
+                }
+                
+            }
+        });
+            
+        </script>
+        
+        <a-scene>
+            <a-assets>
+                <a-asset-item id="human_obj" src="human.OBJ"></a-asset-item>
+            </a-assets>
+                
+            <a-camera position="0 0 1" wasd-controls="enabled: false" orient></a-camera>
+            <a-entity light="type: ambient; color: #333344"></a-entity>
+            <a-entity light="type: directional; color: #FFF" position="1 0 1"></a-entity>
+
+            <a-sky color="#2980b9"></a-sky>
+            <a-entity id="human" obj-model="obj: #human_obj" 
+                      material="shader: skin" position="0 1 0"></a-entity>
+        </a-scene>
+    </body>
+</html>

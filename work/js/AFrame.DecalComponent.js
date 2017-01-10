@@ -87,7 +87,7 @@ AFRAME.registerComponent('decal', {
         
         // Mouse Helper
         var scene = this.el.sceneEl.object3D;
-        mouseHelper = this.mouseHelper = new THREE.Mesh( new THREE.BoxGeometry( 0.1, 0.1, 1 ), new THREE.MeshNormalMaterial() );
+        mouseHelper = this.mouseHelper = new THREE.Mesh( new THREE.BoxGeometry( 0.01, 0.01, 0.1 ), new THREE.MeshNormalMaterial() );
         scene.add( mouseHelper );
         mouseHelper.visible = true;
         
@@ -106,7 +106,6 @@ AFRAME.registerComponent('decal', {
             intersection.normal.copy( evt.detail.intersections[0].face.normal );
             // Mesh
             ray_entity = evt.detail.els[0];
-            mesh = ray_entity.getObject3D('mesh');
         });
         
         // Decal Button
@@ -114,6 +113,16 @@ AFRAME.registerComponent('decal', {
         button.addEventListener('click', addDecal);
         
         function addDecal() {
+            mesh = ray_entity.getObject3D('mesh');
+            
+            if (mesh.type === 'Group') {
+                mesh = mesh.children[0];
+            }
+            
+            if (mesh.geometry.type === 'BufferGeometry') {
+                mesh.geometry = new THREE.Geometry().fromBufferGeometry( mesh.geometry );
+            }
+            
             p = intersection.point;
             var ray_entity_group = ray_entity.object3D;
             ray_entity_group.updateMatrixWorld();

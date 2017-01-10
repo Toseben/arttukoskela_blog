@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
+    </head>
+    <body>
+        <a-scene>
+            <a-assets>
+                <a-asset-item id="human" src="geo/human_001.obj"></a-asset-item>
+            </a-assets>
+            
+            <a-camera></a-camera>
+            <a-obj-model src="#human" material="color: #b7b7b7; side: double" position="0 0 -3"></a-obj-model>
+            <a-sky color="#2980b9"></a-sky>
+        </a-scene>
+    </body>
+</html>

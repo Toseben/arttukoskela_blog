@@ -4,8 +4,10 @@
         <title>Decal Component</title>
         <link rel="stylesheet" href="css/decalComponent.css">
         <link rel="stylesheet" href="css/nouislider.min.css">
+        
         <script src="js/nouislider.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        
         <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
         <script src="js/AFrame.DecalComponent.js"></script>
         <script src="js/THREE.DecalGeometry.js"></script>
@@ -67,19 +69,19 @@
             }
             
         });
-        
+            
         </script>
         
         <!-- A-Frame Scene -->
         <a-scene>
             
             <!-- Camera -->
-            <a-camera id="camera" position="0 -1.6 0"> 
+            <a-camera id="camera" position="0 -0.4 0" near="0.001"> 
                 
                 <a-entity id="raycaster_create"
                           raycaster="objects: .clickable"
-                          position="0 0 -0.25"
-                          geometry="primitive: ring; radius-inner: 0.00001; radius-outer: 0.0025"
+                          position="0 0 -0.01"
+                          geometry="primitive: ring; radius-inner: 0.000001; radius-outer: 0.0001"
                           material="color: #e74c3c; shader: flat"
                           ></a-entity>
                 
@@ -87,37 +89,51 @@
                           raycaster
                           ></a-entity>
                 
-                <a-entity position="0 0 -3" id="target" orient>
-                    
-                    <a-sphere id="sphere" class="clickable"
-                              material="wireframe: false; color: #e74c3c"
-                              geometry="segmentsWidth: 50; segmentsHeight: 25; buffer: false"></a-sphere>
-
-                    <a-torus id="torus" class="clickable"
-                              material="wireframe: false; color: #e74c3c"
-                              geometry="buffer: false"></a-torus>
-
-                    <a-entity id="helper" decal="scale: 1; rotation: 0"></a-entity>
-                    
-                </a-entity>
-                
             </a-camera>
+            
+            <a-entity position="0 0 -1" id="target">
 
+                <!--
+                <a-sphere id="sphere" class="clickable"
+                          material="wireframe: false; color: #e74c3c"
+                          geometry="segmentsWidth: 50; segmentsHeight: 25; buffer: false"></a-sphere>
+
+                <a-torus id="torus" class="clickable"
+                          material="wireframe: false; color: #e74c3c"
+                          geometry="buffer: false"></a-torus>
+                -->
+
+                <a-entity id="human" obj-model="obj: url(geo/human_001.obj)" class="clickable"
+                          material="wireframe: false; color: #aaaaaa; side: double"
+                          geometry="buffer: false"></a-entity>
+
+                <a-entity id="helper" decal="scale: 1; rotation: 0"></a-entity>
+s
+            </a-entity>
+            
+            <a-entity light="type: directional; color: #fadeb9; intensity: 1.5" 
+                      position="-0.5 1 1"></a-entity>
+            <a-entity light="type: directional; color: #38c2ff; intensity: 0.5" 
+                      position="1 0.5 -0.25"></a-entity>
+            <a-entity light="type: directional; color: #ff9438; intensity: 0.5" 
+                      position="0 0.5 -0.5"></a-entity>
+            
             <a-sky color="#2980b9"></a-sky>
+            
         </a-scene>
         
         <script>
-            
+
             // Sliders
             var scale_slider = document.getElementById('scale_slider');
             var rotation_slider = document.getElementById('rotation_slider');
 
             noUiSlider.create(scale_slider, {
-                start: 1,
+                start: 0.1,
                 connect: true,
                 range: {
                     'min': 0,
-                    'max': 2
+                    'max': 0.25
                 }
             });
             
