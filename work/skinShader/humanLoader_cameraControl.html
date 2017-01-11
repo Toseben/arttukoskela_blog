@@ -17,6 +17,8 @@
         <script src="js/shaders/CopyShader.js"></script>
         <script src="js/postprocessing/EffectComposer.js"></script>
         <script src="js/postprocessing/ShaderPass.js"></script>
+        
+        <script src="js/shaders/customPhongFragment.js"></script>
     </head>
     <body>
         
@@ -31,6 +33,8 @@
         
         <span class="values" id="scale_value">...</span>
         <span class="values" id="rotation_value">...</span>
+        
+        <input id="userImage" type="file">
         
         <script>
         
@@ -124,10 +128,6 @@
             }
         });
         
-        //var phong_material = new THREE.ShaderMaterial(THREE.ShaderLib['phong']);
-        var phong_material = THREE.ShaderLib['phong'].uniforms;
-        console.log(phong_material);
-            
         </script>
         
         <a-scene antialias="false">
@@ -178,7 +178,7 @@
                 var rotation_slider = document.getElementById('rotation_slider');
 
                 noUiSlider.create(scale_slider, {
-                    start: 0.1,
+                    start: 0.15,
                     connect: true,
                     range: {
                         'min': 0,
