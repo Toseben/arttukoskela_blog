@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tattoo Designer</title>
+        <link rel="stylesheet" type="text/css" href="css/jquery.fullPage.css"/>
+        <link rel="stylesheet" type="text/css" href="css/nouislider.min.css">
+        <link rel="stylesheet" type="text/css" href="css/dropzone.css">
+        <link rel="stylesheet" type="text/css" href="css/style.css"/>
+        
+        <style>
+            
+            * {
+                box-sizing: border-box;
+                margin: 0;
+            }
+            
+            #section_0 {
+                background-image: url(img/one.jpg);
+            }
+            
+            div #gui {
+                width: 20%;
+                max-width: 200px;
+                height: 100%;
+                background: #2ecc71;
+                float: left;
+            }
+            
+            div #aframe {
+                height: 100%;
+                background: #27ae60;
+                overflow: hidden;
+            }
+            
+            iframe {
+                height: 100%;
+                width: 100%;
+            }
+            
+            .gallery_title {
+                width: 100%;
+                height: 10%;
+                background: #18a554;
+                border-radius: 50px;
+            }
+            
+            .lightbox_gallery {
+                width: 100%;
+                height: 90%;
+                background: #58d18b;
+                border-radius: 50px;
+            }
+            
+            .button {
+                color: white;
+                text-align: center;
+                font-size: 18px;
+                font-weight: bold;
+                z-index: 10;
+                background-color: #4caf57;
+            }
+            
+            #plus, #minus {
+                width: 50%;
+                height: 10%;
+                float: left;
+            }
+            
+            #add, #remove {
+                width: 100%;
+                height: 10%;
+            }
+            
+            .sliders {
+                margin: 25px 0px;
+            }
+            
+            .values {
+                display: block;
+                text-align: center;
+                margin: 25px 0px;
+            }
+
+        </style>
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery.fullPage.min.js"></script>
+        <script src="js/nouislider.min.js"></script>
+        <script src="js/dropzone.js"></script>
+        
+    </head>
+    
+    <body>
+        
+        <div id="fullpage">
+            <div class="section" id="section_0"></div>
+            
+            <div class="section" id="section_1">
+            
+                <div id="gui">
+                    <button type="button" class="button" id="plus">+</button>
+                    <button type="button" class="button" id="minus">-</button>
+                    
+                    <div id="dropzone_div">
+                        <form id="dropzone" action="" class="dropzone needsclick dz-clickable">
+                            <div class="dz-message needsclick">Drop files here or click to upload.</div>
+                        </form>
+                    </div>
+                    
+                    <button type="button" class="button" id="add">ADD</button>
+                    
+                    <div class="sliders" id="scale_slider"></div>
+                    <span class="values" id="scale_value">...</span>
+                    <div class="sliders" id="rotation_slider"></div>
+                    <span class="values" id="rotation_value">...</span>
+                    
+                    <button type="button" class="button" id="remove">REMOVE</button>
+                </div>
+                
+                <div id="aframe">
+                    <iframe id="iframe" src="/aframe/aframe_tattoo.html"></iframe>
+                </div>
+                    
+            </div>
+            
+            <div class="section" id="section_2">
+                
+                <div class="gallery_title"></div>
+                
+                <div class="lightbox_gallery"></div>
+                
+            </div>
+            
+            <div class="section fp-auto-height" id="section_3">
+                <div class="footer"></div>
+            </div>
+        </div>
+            
+    
+        <script>
+            
+            Dropzone.options.dropzone = {
+                url: "/",
+                accept: function (file, done) {
+                    done('Here you can write anything');
+                    $('.dz-preview').last().toggleClass('dz-error dz-success');
+                    var evt = document.createEvent("CustomEvent");
+                    evt.initCustomEvent("MyEventType", true, true, file);
+                    window.dispatchEvent(evt);
+                },
+                init: function() {
+                    this.on("addedfile", function() {
+                        if (this.files[1]!=null){
+                            this.removeFile(this.files[0]);
+                        }
+                    });
+                }
+            };
+
+        </script>
+        
+        <script>
+            
+            var anchorIndex;
+            
+            $(document).ready(function() {
+                $('#fullpage').fullpage({
+                    anchors: ['Title', 'Tattoo', 'Gallery', 'Footer'],
+                    navigation: true,
+                    navigationPosition: 'right',
+                    navigationTooltips: ['Title', 'Tattoo', 'Gallery', 'Footer'],
+                    
+                    afterLoad: function(anchorLink, index){
+                        anchorIndex = index;
+                        if (index == 2) {
+                            console.log("INIT LOAD");
+                        }
+                    }
+                    
+                });
+                
+                var initMoveDelay = 2000;
+                setTimeout(function() {
+                    if (anchorIndex === 1) {
+                        $.fn.fullpage.moveSectionDown();
+                    }
+                }, initMoveDelay);
+                
+            });
+            
+            // SLIDERS
+            init_slider();
+            function init_slider() {
+                
+                // Sliders
+                var scale_slider = document.getElementById('scale_slider');
+                var rotation_slider = document.getElementById('rotation_slider');
+
+                noUiSlider.create(scale_slider, {
+                    start: 0.15,
+                    connect: true,
+                    range: {
+                        'min': 0,
+                        'max': 0.25
+                    }
+                });
+
+                noUiSlider.create(rotation_slider, {
+                    start: 180,
+                    connect: true,
+                    range: {
+                        'min': 0,
+                        'max': 360
+                    }
+                });
+                
+                var scaleSliderValue = document.getElementById('scale_value');
+                scale_slider.noUiSlider.on('update', function( values, handle ) {
+                    scaleSliderValue.innerHTML = values[handle];
+                });
+
+                var rotationSliderValue = document.getElementById('rotation_value');
+                rotation_slider.noUiSlider.on('update', function( values, handle ) {
+                    rotationSliderValue.innerHTML = values[handle];
+                });
+                
+            }
+        
+        </script>
+        
+    </body>
+</html>
